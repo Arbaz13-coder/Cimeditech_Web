@@ -1,0 +1,11 @@
+{
+  "name": "CMX Web Portal",
+  "short_name": "CMX",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F7F9FC",
+  "theme_color": "#175CD3",
+  "description": "CMX Web Portal authentication client",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}
