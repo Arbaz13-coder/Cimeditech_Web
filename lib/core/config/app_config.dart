@@ -18,8 +18,8 @@ class AppConfig {
   /// Current AUS middleware requires xRCK.
   /// Pass this using --dart-define; do not commit a production secret.
   static const String ausClientKey = String.fromEnvironment(
-    'AUS_CLIENT_KEY',
-    defaultValue: '',
+    '276F970B6F02433EF26B13E08244AE04F9C2E0EBD2F755EF9639A4DF66EF1467',
+    defaultValue: '276F970B6F02433EF26B13E08244AE04F9C2E0EBD2F755EF9639A4DF66EF1467',
   );
 
   /// Current AUS middleware checks that xRCT exists.
