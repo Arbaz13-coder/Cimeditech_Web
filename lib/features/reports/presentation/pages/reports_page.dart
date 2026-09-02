@@ -52,6 +52,7 @@ class _ReportsPageState extends State<ReportsPage> {
   bool _loadingExecution = false;
   bool _exporting = false;
   bool _filtersDirty = false;
+  bool _filtersExpanded = true;
   String _companiesError = '';
   String _catalogError = '';
   String _definitionError = '';
@@ -123,20 +124,7 @@ class _ReportsPageState extends State<ReportsPage> {
       );
     }
   }
-String _groupDigits(int value) {
-  final isNegative = value < 0;
-  final digits = value.abs().toString();
-  final buffer = StringBuffer();
 
-  for (int i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) {
-      buffer.write(',');
-    }
-    buffer.write(digits[i]);
-  }
-
-  return isNegative ? '-$buffer' : buffer.toString();
-}
   Future<void> _loadCatalog(
     int companyId, {
     bool preserveReport = false,
@@ -165,6 +153,7 @@ String _groupDigits(int value) {
         _filterValues = <String, dynamic>{};
         _filterErrors = <String, String>{};
         _filtersDirty = false;
+        _filtersExpanded = true;
       }
     });
 
@@ -220,6 +209,7 @@ String _groupDigits(int value) {
       _filterErrors = <String, String>{};
       _sort = const <ReportSort>[];
       _filtersDirty = false;
+      _filtersExpanded = true;
     });
     await _loadCatalog(company.id);
   }
@@ -254,6 +244,7 @@ String _groupDigits(int value) {
       _filterErrors = <String, String>{};
       _sort = const <ReportSort>[];
       _filtersDirty = false;
+      _filtersExpanded = true;
       _pageNo = 1;
     });
 
@@ -320,6 +311,7 @@ String _groupDigits(int value) {
         setState(() {
           _filterErrors = Map<String, String>.from(validation.errors);
           _executionError = 'Please correct the highlighted report filters.';
+          _filtersExpanded = true;
         });
       }
       return;
@@ -353,11 +345,15 @@ String _groupDigits(int value) {
         _pageNo = result.page.pageNo;
         _pageSize = result.page.pageSize;
         _filtersDirty = false;
+        _filtersExpanded = false;
       });
     } on ApiException catch (error) {
       if (!mounted || request != _executionRequest) return;
       if (_handleSessionExpired(error)) return;
-      setState(() => _executionError = error.message);
+      setState(() {
+        _executionError = error.message;
+        if (_result == null) _filtersExpanded = true;
+      });
     } finally {
       if (mounted && request == _executionRequest) {
         setState(() => _loadingExecution = false);
@@ -442,6 +438,7 @@ String _groupDigits(int value) {
       _exportStatus = '';
       _loadingExecution = false;
       _filtersDirty = false;
+      _filtersExpanded = true;
     });
   }
 
@@ -512,6 +509,7 @@ String _groupDigits(int value) {
       setState(() {
         _filterErrors = Map<String, String>.from(validation.errors);
         _exportError = 'Please correct the highlighted filters before exporting.';
+        _filtersExpanded = true;
       });
       return;
     }
@@ -666,7 +664,7 @@ String _groupDigits(int value) {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -679,7 +677,7 @@ String _groupDigits(int value) {
                 ? null
                 : () => _loadCompanies(),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -766,16 +764,18 @@ String _groupDigits(int value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ReportHeader(definition: definition),
-        const SizedBox(height: 8),
         ReportFilterPanel(
           definition: definition,
           values: _filterValues,
           errors: _filterErrors,
           loading: _loadingExecution || _exporting,
+          expanded: _filtersExpanded,
           onChanged: _changeFilter,
           onLookup: _lookup,
           onReset: _resetFilters,
+          onToggle: () => setState(
+            () => _filtersExpanded = !_filtersExpanded,
+          ),
           onRun: () {
             setState(() => _pageNo = 1);
             _execute();
@@ -1117,104 +1117,6 @@ class _MobileReportSelector extends StatelessWidget {
   }
 }
 
-class _ReportHeader extends StatelessWidget {
-  const _ReportHeader({required this.definition});
-
-  final ReportDefinition definition;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(color: Color(0xFFE4E7EC)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final showSubtype = constraints.maxWidth >= 620;
-            return Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        definition.effectiveName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF101828),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        definition.code,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF98A2B3),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _MetaChip(text: definition.type),
-                if (showSubtype && definition.subtype.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  _MetaChip(text: definition.subtype),
-                ],
-                const SizedBox(width: 6),
-                Tooltip(
-                  message: 'Definition version ${definition.definitionVersion}',
-                  child: _MetaChip(text: 'v${definition.definitionVersion}'),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaChip extends StatelessWidget {
-  const _MetaChip({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 130),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F4F7),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: Color(0xFF475467),
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
 class _InlineNotice extends StatelessWidget {
   const _InlineNotice({
     required this.icon,
@@ -1272,7 +1174,7 @@ class _SummaryStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 58,
+      height: 50,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: summary.length,
@@ -1281,7 +1183,7 @@ class _SummaryStrip extends StatelessWidget {
           final entry = summary.entries.elementAt(index);
           return Container(
             constraints: const BoxConstraints(minWidth: 130, maxWidth: 230),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: const Color(0xFFE4E7EC)),
@@ -1307,7 +1209,7 @@ class _SummaryStrip extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Color(0xFF101828),
-                    fontSize: 14,
+                  fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -1481,4 +1383,15 @@ String _humanize(String value) {
       .where((word) => word.isNotEmpty)
       .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
       .join(' ');
+}
+
+String _groupDigits(int value) {
+  final digits = value.toString();
+  final buffer = StringBuffer();
+  for (var index = 0; index < digits.length; index++) {
+    final remaining = digits.length - index;
+    buffer.write(digits[index]);
+    if (remaining > 1 && remaining % 3 == 1) buffer.write(',');
+  }
+  return buffer.toString();
 }

@@ -29,3 +29,14 @@ minimumSize: const Size.fromHeight(52)
   screen overflow and unreachable sections.
 - Dynamic Reports now downloads the full filtered/sorted result as PDF or
   Excel-compatible `.xls`, with progress, permission checks and safe row caps.
+
+## Dynamic Report result workspace redesign
+
+- Removed Report Setup from the Flutter portal navigation. Configuration is
+  handled by the separate internal Python utility.
+- Combined the report identity and filter controls into one compact toolbar.
+- Filters automatically collapse after a successful run so the grid receives
+  most of the available page height, and they reopen when validation fails.
+- Reduced heading and data-row heights and added alternate-row and hover states.
+- Added a responsive result toolbar with Copy, PDF, Excel and Refresh actions.
+- Fixed the missing `_groupDigits` helper used by report export messages.

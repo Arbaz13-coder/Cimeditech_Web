@@ -11,8 +11,7 @@ After login the portal opens on:
 1. **Dashboard** - intentionally empty/placeholder for future widgets.
 2. **Data Management** - currently contains **User Mapping**.
 3. **Reports** - one generic runtime page for all configured company/user reports.
-4. **Report Setup** - Admin-only function, parameter, column, action and assignment configuration.
-5. **Report Designer** - existing drag-and-drop report designer with PDF preview/export.
+4. **Report Designer** - existing drag-and-drop report designer with PDF preview/export.
 
 Desktop uses a collapsible left sidebar. Smaller screens automatically use a drawer menu.
 
@@ -77,6 +76,8 @@ Implemented UI:
 - Metadata-driven text, number, checkbox, date, dropdown and multiselect filters
 - Remote lookup search with dependent-parameter support
 - Server-side paging and sortable configured columns
+- Results-first workspace that collapses filters after a successful run
+- Compact grid density so substantially more rows remain visible
 - Loading, empty, timeout, network, session and API-error states with retry
 - Definition-version cache and stale-response protection
 - Summary cards and current-page CSV copy when export access is granted
@@ -89,24 +90,6 @@ POST /api/app/v1/report/runtime
 ```
 
 See `docs/dynamic_reports_frontend.md` for the complete frontend/API flow.
-
-## Report Setup
-
-- Searchable list of every configured report
-- Create and update through the transactional `report/configure` API
-- Structured editors for overview, parameters, columns, future actions and assignments
-- JSON validation for defaults, control validation, dependencies and action configuration
-- Company picker, server-context RID, company-level access and exact-user overrides
-- Unsaved-change protection, definition-version feedback and Admin permission handling
-- Section-aware client validation aligned with the backend function/schema contract
-
-Configuration endpoint:
-
-```text
-POST /api/app/v1/report/configure
-```
-
-See `docs/report_setup_frontend.md` for the complete configuration flow.
 
 ## Main project structure
 

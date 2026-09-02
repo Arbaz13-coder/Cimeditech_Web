@@ -4,7 +4,6 @@ import '../../../auth/data/auth_repository.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../../../report_designer/presentation/pages/report_designer_page.dart';
 import '../../../reports/data/report_repository.dart';
-import '../../../reports/presentation/pages/report_configuration_page.dart';
 import '../../../reports/presentation/pages/reports_page.dart';
 import '../../../user_mapping/data/user_mapping_repository.dart';
 import '../../../user_mapping/presentation/pages/user_mapping_page.dart';
@@ -13,7 +12,6 @@ enum PortalSection {
   dashboard,
   dataManagement,
   reports,
-  reportSetup,
   reportDesigner,
 }
 
@@ -117,12 +115,6 @@ class _PortalShellState extends State<PortalShell> {
           repository: widget.reportRepository,
           onSessionExpired: () => _expireSession(),
         );
-      case PortalSection.reportSetup:
-        return ReportConfigurationPage(
-          key: const PageStorageKey('report-setup'),
-          repository: widget.reportRepository,
-          onSessionExpired: () => _expireSession(),
-        );
       case PortalSection.reportDesigner:
         return const ReportDesignerPage(
           key: PageStorageKey('report-designer'),
@@ -139,8 +131,6 @@ class _PortalShellState extends State<PortalShell> {
         return 'User Mapping';
       case PortalSection.reports:
         return 'Dynamic Reports';
-      case PortalSection.reportSetup:
-        return 'Report Setup';
       case PortalSection.reportDesigner:
         return 'Report Designer';
     }
@@ -154,8 +144,6 @@ class _PortalShellState extends State<PortalShell> {
         return 'Data Management';
       case PortalSection.reports:
         return 'Reports';
-      case PortalSection.reportSetup:
-        return 'Reports Administration';
       case PortalSection.reportDesigner:
         return 'Reports';
     }
@@ -328,15 +316,6 @@ class _DesktopSidebar extends StatelessWidget {
                     collapsed: collapsed,
                     selected: selected == PortalSection.reports,
                     onTap: () => onSelected(PortalSection.reports),
-                  ),
-                  const SizedBox(height: 5),
-                  _SidebarItem(
-                    icon: Icons.settings_suggest_outlined,
-                    label: 'Report Setup',
-                    subtitle: 'Admin Configuration',
-                    collapsed: collapsed,
-                    selected: selected == PortalSection.reportSetup,
-                    onTap: () => onSelected(PortalSection.reportSetup),
                   ),
                   const SizedBox(height: 5),
                   _SidebarItem(
@@ -637,15 +616,6 @@ class _MobileSidebar extends StatelessWidget {
                       collapsed: false,
                       selected: selected == PortalSection.reports,
                       onTap: () => onSelected(PortalSection.reports),
-                    ),
-                    const SizedBox(height: 5),
-                    _SidebarItem(
-                      icon: Icons.settings_suggest_outlined,
-                      label: 'Report Setup',
-                      subtitle: 'Admin Configuration',
-                      collapsed: false,
-                      selected: selected == PortalSection.reportSetup,
-                      onTap: () => onSelected(PortalSection.reportSetup),
                     ),
                     const SizedBox(height: 5),
                     _SidebarItem(

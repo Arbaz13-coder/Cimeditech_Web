@@ -1,5 +1,5 @@
 name: cmx_web_portal
-description: Professional CMX Web Portal with authentication, user mapping, dynamic reports, report setup and report designer for Flutter Web, Android and iOS.
+description: Professional CMX Web Portal with authentication, user mapping, dynamic reports and report designer for Flutter Web, Android and iOS.
 publish_to: "none"
 version: 1.0.0+1
 

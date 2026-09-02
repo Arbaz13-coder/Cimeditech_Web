@@ -102,6 +102,6 @@ lib/features/reports/
         └── report_lookup_field.dart
 ```
 
-The Admin-only `report/configure` API is exposed through the separate
-**Reports Administration > Report Setup** workspace. The existing visual Report
+The Admin-only `report/configure` API is handled by the separate internal
+Python report-configuration utility. The existing visual Report
 Designer also remains separate from both metadata configuration and runtime.

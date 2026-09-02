@@ -19,9 +19,11 @@ class ReportFilterPanel extends StatelessWidget {
     required this.values,
     required this.errors,
     required this.loading,
+    required this.expanded,
     required this.onChanged,
     required this.onLookup,
     required this.onReset,
+    required this.onToggle,
     required this.onRun,
   });
 
@@ -29,9 +31,11 @@ class ReportFilterPanel extends StatelessWidget {
   final Map<String, dynamic> values;
   final Map<String, String> errors;
   final bool loading;
+  final bool expanded;
   final ReportFilterChanged onChanged;
   final ReportParameterLookup onLookup;
   final VoidCallback onReset;
+  final VoidCallback onToggle;
   final VoidCallback onRun;
 
   @override
@@ -42,23 +46,20 @@ class ReportFilterPanel extends StatelessWidget {
       margin: EdgeInsets.zero,
       elevation: 0,
       color: Colors.white,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         side: const BorderSide(color: Color(0xFFE4E7EC)),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 12, 10),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+            padding: const EdgeInsets.fromLTRB(14, 9, 10, 9),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final narrow = constraints.maxWidth < 700;
+                final title = Row(
                   children: [
                     Container(
                       width: 32,
@@ -68,70 +69,107 @@ class ReportFilterPanel extends StatelessWidget {
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: const Icon(
-                        Icons.tune_rounded,
+                        Icons.assessment_outlined,
                         size: 18,
                         color: Color(0xFF175CD3),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Report filters',
-                          style: TextStyle(
-                            color: Color(0xFF101828),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            definition.effectiveName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF101828),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        Text(
-                          parameters.isEmpty
-                              ? 'This report has no input parameters'
-                              : '${parameters.length} parameter${parameters.length == 1 ? '' : 's'} configured',
-                          style: const TextStyle(
-                            color: Color(0xFF667085),
-                            fontSize: 11,
+                          Text(
+                            parameters.isEmpty
+                                ? '${definition.code} · no filters required'
+                                : expanded
+                                    ? '${definition.code} · ${parameters.length} filter${parameters.length == 1 ? '' : 's'}'
+                                    : '${parameters.length} filter${parameters.length == 1 ? '' : 's'} applied · result view',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF667085),
+                              fontSize: 10,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
-                ),
-                Row(
+                );
+                final actions = Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (parameters.isNotEmpty)
+                      TextButton.icon(
+                        onPressed: loading ? null : onToggle,
+                        icon: Icon(
+                          expanded
+                              ? Icons.expand_less_rounded
+                              : Icons.tune_rounded,
+                          size: 18,
+                        ),
+                        label: Text(expanded ? 'Hide' : 'Filters'),
+                      ),
                     TextButton.icon(
                       onPressed: loading ? null : onReset,
-                      icon: const Icon(Icons.restart_alt_rounded, size: 18),
+                      icon: const Icon(Icons.restart_alt_rounded, size: 17),
                       label: const Text('Reset'),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     FilledButton.icon(
                       onPressed: loading ? null : onRun,
                       icon: loading
                           ? const SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 15,
+                              height: 15,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: Colors.white,
                               ),
                             )
-                          : const Icon(Icons.play_arrow_rounded, size: 19),
-                      label: Text(loading ? 'Running…' : 'Run report'),
+                          : const Icon(Icons.play_arrow_rounded, size: 18),
+                      label: Text(loading ? 'Running…' : 'Run'),
                     ),
                   ],
-                ),
-              ],
+                );
+
+                if (narrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      title,
+                      const SizedBox(height: 7),
+                      Align(alignment: Alignment.centerRight, child: actions),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(child: title),
+                    const SizedBox(width: 12),
+                    actions,
+                  ],
+                );
+              },
             ),
           ),
-          if (parameters.isNotEmpty) ...[
+          if (parameters.isNotEmpty && expanded) ...[
             const Divider(height: 1),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 260),
+              constraints: const BoxConstraints(maxHeight: 220),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final fieldWidth = _fieldWidth(constraints.maxWidth);

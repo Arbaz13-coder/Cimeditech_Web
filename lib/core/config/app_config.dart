@@ -6,7 +6,8 @@ class AppConfig {
   /// Example: https://api.example.com
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://localhost:7052',
+    // defaultValue: 'https://localhost:7052',
+    defaultValue: 'https://hf7n7szw51.execute-api.ap-south-1.amazonaws.com/Prod',
   );
 
   /// Value used by the backend route: /api/{var}/...
@@ -18,8 +19,8 @@ class AppConfig {
   /// Current AUS middleware requires xRCK.
   /// Pass this using --dart-define; do not commit a production secret.
   static const String ausClientKey = String.fromEnvironment(
-    '276F970B6F02433EF26B13E08244AE04F9C2E0EBD2F755EF9639A4DF66EF1467',
-    defaultValue: '276F970B6F02433EF26B13E08244AE04F9C2E0EBD2F755EF9639A4DF66EF1467',
+    'AUS_CLIENT_KEY',
+    defaultValue: '',
   );
 
   /// Current AUS middleware checks that xRCT exists.
