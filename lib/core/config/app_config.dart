@@ -6,7 +6,7 @@ class AppConfig {
   /// Example: https://api.example.com
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://localhost:7052',
+    defaultValue: 'https://hf7n7szw51.execute-api.ap-south-1.amazonaws.com',
   );
 
   /// Value used by the backend route: /api/{var}/...
