@@ -1,4 +1,3 @@
-import 'package:cmx_web_portal/features/reports/models/report_configuration_models.dart';
 import 'package:cmx_web_portal/features/reports/models/report_models.dart';
 import 'package:cmx_web_portal/features/reports/services/dynamic_report_formatter.dart';
 import 'package:cmx_web_portal/features/reports/services/report_filter_codec.dart';
@@ -120,104 +119,6 @@ void main() {
     });
   });
 
-  group('report configuration models', () {
-    test('parses configuration children and creates a complete save payload', () {
-      final draft = ReportConfigurationDraft.fromJson(<String, dynamic>{
-        'report_id': 7,
-        'report_name': 'Sales Register',
-        'display_name': 'Sales Register',
-        'report_code': 'sales.register',
-        'report_type': 'TABLE',
-        'report_subtype': 'Sales',
-        'data_function': 'rpt.fn_sales_register',
-        'is_default': false,
-        'is_active': true,
-        'default_page_size': 100,
-        'max_page_size': 500,
-        'timeout_seconds': 60,
-        'definition_version': 4,
-        'parameters': <Map<String, dynamic>>[
-          <String, dynamic>{
-            ..._parameterJson('fromDate', 'From Date', 'DATE'),
-            'data_function': null,
-          },
-        ],
-        'columns': <Map<String, dynamic>>[
-          <String, dynamic>{
-            'name': 'voucher_date',
-            'display_name': 'Voucher Date',
-            'display_order': 1,
-            'data_type': 'DATE',
-            'format': 'DATE',
-            'alignment': 'LEFT',
-            'width': 120,
-            'is_visible': true,
-            'is_sortable': true,
-            'is_filterable': false,
-            'is_exportable': true,
-            'is_total': false,
-            'aggregate_type': '',
-            'is_active': true,
-          },
-        ],
-        'actions': <Map<String, dynamic>>[],
-        'assignments': <Map<String, dynamic>>[
-          <String, dynamic>{
-            'r_id': 2,
-            'o_id': 10,
-            'u_id': null,
-            'can_view': true,
-            'can_export': true,
-            'is_active': true,
-          },
-        ],
-      });
-
-      expect(draft.validate().isValid, isTrue);
-      final payload = draft.toPayload();
-      expect(payload['operation'], 'Save');
-      expect((payload['parameters'] as List).length, 1);
-      expect((payload['columns'] as List).length, 1);
-      expect(
-        ((payload['assignments'] as List).single as Map)['u_id'],
-        isNull,
-      );
-    });
-
-    test('requires an assignment for an active non-default report', () {
-      final draft = ReportConfigurationDraft.empty()
-        ..reportName = 'Example'
-        ..displayName = 'Example'
-        ..reportCode = 'example.report'
-        ..dataFunction = 'rpt.fn_example_report'
-        ..columns.add(ReportColumnDraft.empty(1));
-
-      final validation = draft.validate();
-      expect(validation.isValid, isFalse);
-      expect(
-        validation.errors,
-        contains(
-          'An active non-default report needs a view-enabled assignment.',
-        ),
-      );
-    });
-
-    test('accepts backend-compatible zero order and server-context RID', () {
-      final draft = ReportConfigurationDraft.empty()
-        ..reportName = 'Example'
-        ..displayName = 'Example'
-        ..reportCode = 'EXAMPLE.REPORT'
-        ..dataFunction = 'RPT.FN_EXAMPLE_REPORT'
-        ..columns.add(ReportColumnDraft.empty(0))
-        ..assignments.add(ReportAssignmentDraft.empty()..oId = 10);
-
-      expect(draft.validate().isValid, isTrue);
-      final assignment = (draft.toPayload()['assignments'] as List).single as Map;
-      expect(assignment['r_id'], 0);
-      expect(assignment['o_id'], 10);
-    });
-  });
-
   group('report filter codec', () {
     test('creates accounting date defaults for required date fields', () {
       final definition = ReportDefinition.fromJson(<String, dynamic>{
@@ -286,6 +187,83 @@ void main() {
       expect(result.isValid, isFalse);
       expect(result.errors['party'], 'Party is required.');
     });
+
+    test('accepts comma-separated typed function array values', () {
+      final parameters = <ReportParameter>[
+        ReportParameter.fromJson(
+          _parameterJson('ledgerIds', 'Ledgers', 'ID_LIST')
+            ..['allow_multiple'] = true
+            ..['database_type'] = 'bigint[]',
+        ),
+        ReportParameter.fromJson(
+          _parameterJson('rates', 'Rates', 'DECIMAL_LIST', order: 2)
+            ..['allow_multiple'] = true
+            ..['database_type'] = 'numeric[]',
+        ),
+      ];
+
+      final result = ReportFilterCodec.build(
+        parameters,
+        <String, dynamic>{
+          'ledgerIds': '10, 20,30',
+          'rates': '68.50, 72.25',
+        },
+      );
+
+      expect(result.isValid, isTrue);
+      expect(result.filters['ledgerIds'], <int>[10, 20, 30]);
+      expect(result.filters['rates'], <num>[68.5, 72.25]);
+    });
+  });
+
+  test('parses an auto-configured typed report definition', () {
+    final definition = ReportDefinition.fromJson(<String, dynamic>{
+      'report_id': 11,
+      'report_name': 'Ledger Report',
+      'display_name': 'Ledger Report',
+      'report_code': 'accounts.ledger',
+      'report_type': 'TABLE',
+      'report_subtype': 'Accounts',
+      'is_default': false,
+      'is_active': true,
+      'can_export': true,
+      'default_page_size': 100,
+      'max_page_size': 500,
+      'timeout_seconds': 60,
+      'definition_version': 2,
+      'engine_version': 2,
+      'parameters': <Map<String, dynamic>>[
+        _parameterJson('ledgerIds', 'Ledgers', 'ID_LIST')
+          ..['database_type'] = 'bigint[]'
+          ..['ui_element_type'] = 'REMOTE_MULTISELECT'
+          ..['allow_multiple'] = true,
+      ],
+      'columns': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'ledger_name',
+          'display_name': 'Ledger Name',
+          'display_order': 1,
+          'data_type': 'STRING',
+          'database_type': 'text',
+          'format': 'TEXT',
+          'alignment': 'LEFT',
+          'width': 220,
+          'is_visible': true,
+          'is_sortable': true,
+          'is_filterable': false,
+          'is_exportable': true,
+          'is_total': false,
+          'aggregate_type': '',
+          'is_active': true,
+        },
+      ],
+      'actions': <Map<String, dynamic>>[],
+    });
+
+    expect(definition.engineVersion, 2);
+    expect(definition.parameters.single.databaseType, 'bigint[]');
+    expect(definition.parameters.single.usesRemoteLookup, isTrue);
+    expect(definition.columns.single.databaseType, 'text');
   });
 
   test('formats report values and produces escaped CSV', () {

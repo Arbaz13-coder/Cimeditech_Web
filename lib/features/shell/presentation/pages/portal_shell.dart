@@ -103,7 +103,11 @@ class _PortalShellState extends State<PortalShell> {
   Widget _buildSection(PortalSection section) {
     switch (section) {
       case PortalSection.dashboard:
-        return const DashboardPage(key: PageStorageKey('dashboard'));
+        return DashboardPage(
+          key: const PageStorageKey('dashboard'),
+          onOpenReports: () => _select(PortalSection.reports),
+          onOpenUserMapping: () => _select(PortalSection.dataManagement),
+        );
       case PortalSection.dataManagement:
         return UserMappingPage(
           key: const PageStorageKey('user-mapping'),

@@ -123,19 +123,29 @@ class ReportFilterCodec {
   ) {
     final multiple = parameter.acceptsMultiple;
     if (multiple) {
-      if (raw is! List) {
+      final rawValues = raw is List
+          ? raw
+          : raw is String
+              ? raw
+                  .split(',')
+                  .map((item) => item.trim())
+                  .where((item) => item.isNotEmpty)
+                  .toList(growable: false)
+              : null;
+      if (rawValues == null || rawValues.isEmpty) {
         return _FilterConversion.error(
-          '${parameter.displayName} must contain one or more selected values.',
+          '${parameter.displayName} must contain one or more comma-separated values.',
         );
       }
 
       final elementType = switch (parameter.dataType) {
         'ID_LIST' => 'ID',
         'STRING_LIST' => 'STRING',
+        'DECIMAL_LIST' => 'DECIMAL',
         _ => parameter.dataType,
       };
       final values = <Object?>[];
-      for (final item in raw) {
+      for (final item in rawValues) {
         final converted = _convertScalar(
           elementType,
           unwrapValue(item),

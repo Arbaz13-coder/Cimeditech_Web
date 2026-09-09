@@ -91,9 +91,9 @@ class ReportFilterPanel extends StatelessWidget {
                           ),
                           Text(
                             parameters.isEmpty
-                                ? '${definition.code} · no filters required'
+                                ? '${definition.code} · no filters required${definition.engineVersion >= 2 ? ' · auto-configured' : ''}'
                                 : expanded
-                                    ? '${definition.code} · ${parameters.length} filter${parameters.length == 1 ? '' : 's'}'
+                                    ? '${definition.code} · ${parameters.length} filter${parameters.length == 1 ? '' : 's'}${definition.engineVersion >= 2 ? ' · auto-configured' : ''}'
                                     : '${parameters.length} filter${parameters.length == 1 ? '' : 's'} applied · result view',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -281,7 +281,9 @@ class ReportFilterPanel extends StatelessWidget {
     }
 
     final rawValue = value is ReportLookupOption ? value.value : value;
-    final textValue = parameter.dataType == 'JSON' &&
+    final textValue = parameter.acceptsMultiple && rawValue is List
+        ? rawValue.map((item) => item.toString()).join(', ')
+        : parameter.dataType == 'JSON' &&
             rawValue != null &&
             rawValue is! String
         ? jsonEncode(rawValue)
@@ -366,7 +368,9 @@ class _TextParameterFieldState extends State<_TextParameterField> {
       decoration: InputDecoration(
         labelText: widget.parameter.label,
         hintText: widget.parameter.hintText.isEmpty
-            ? 'Enter ${widget.parameter.displayName.toLowerCase()}'
+            ? widget.parameter.acceptsMultiple
+                ? 'Enter comma-separated values'
+                : 'Enter ${widget.parameter.displayName.toLowerCase()}'
             : widget.parameter.hintText,
         errorText: widget.errorText,
       ),

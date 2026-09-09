@@ -87,6 +87,7 @@ class ReportDefinition {
     required this.maxPageSize,
     required this.timeoutSeconds,
     required this.definitionVersion,
+    this.engineVersion = 1,
     required this.parameters,
     required this.columns,
     required this.actions,
@@ -105,6 +106,7 @@ class ReportDefinition {
   final int maxPageSize;
   final int timeoutSeconds;
   final int definitionVersion;
+  final int engineVersion;
   final List<ReportParameter> parameters;
   final List<ReportColumn> columns;
   final List<ReportAction> actions;
@@ -146,6 +148,7 @@ class ReportDefinition {
       maxPageSize: _asInt(json['max_page_size'], fallback: 500),
       timeoutSeconds: _asInt(json['timeout_seconds'], fallback: 60),
       definitionVersion: _asInt(json['definition_version']),
+      engineVersion: _asInt(json['engine_version'], fallback: 1),
       parameters: List<ReportParameter>.unmodifiable(parameters),
       columns: List<ReportColumn>.unmodifiable(columns),
       actions: List<ReportAction>.unmodifiable(actions),
@@ -159,6 +162,7 @@ class ReportParameter {
     required this.name,
     required this.displayName,
     required this.dataType,
+    this.databaseType = '',
     required this.uiElementType,
     required this.displayOrder,
     required this.isRequired,
@@ -174,6 +178,7 @@ class ReportParameter {
   final String name;
   final String displayName;
   final String dataType;
+  final String databaseType;
   final String uiElementType;
   final int displayOrder;
   final bool isRequired;
@@ -185,7 +190,10 @@ class ReportParameter {
   final bool isActive;
 
   bool get acceptsMultiple =>
-      allowMultiple || dataType == 'ID_LIST' || dataType == 'STRING_LIST';
+      allowMultiple ||
+      dataType == 'ID_LIST' ||
+      dataType == 'STRING_LIST' ||
+      dataType == 'DECIMAL_LIST';
 
   bool get usesRemoteLookup => hasDataFunction ||
       uiElementType == 'REMOTE_DROPDOWN' ||
@@ -233,6 +241,7 @@ class ReportParameter {
       name: _asString(json['name']),
       displayName: _asString(json['display_name']),
       dataType: _asString(json['data_type']).toUpperCase(),
+      databaseType: _asString(json['database_type']),
       uiElementType: _asString(json['ui_element_type']).toUpperCase(),
       displayOrder: _asInt(json['display_order']),
       isRequired: _asBool(json['is_required']),
@@ -252,6 +261,7 @@ class ReportColumn {
     required this.displayName,
     required this.displayOrder,
     required this.dataType,
+    this.databaseType = '',
     required this.format,
     required this.alignment,
     required this.width,
@@ -268,6 +278,7 @@ class ReportColumn {
   final String displayName;
   final int displayOrder;
   final String dataType;
+  final String databaseType;
   final String format;
   final String alignment;
   final double? width;
@@ -285,6 +296,7 @@ class ReportColumn {
       displayName: _asString(json['display_name']),
       displayOrder: _asInt(json['display_order']),
       dataType: _asString(json['data_type']).toUpperCase(),
+      databaseType: _asString(json['database_type']),
       format: _asString(json['format']).toUpperCase(),
       alignment: _asString(json['alignment']).toUpperCase(),
       width: _asDoubleOrNull(json['width']),
@@ -412,6 +424,7 @@ class ReportResult {
     required this.reportCode,
     required this.displayName,
     required this.definitionVersion,
+    this.engineVersion = 1,
     required this.companyId,
     required this.columns,
     required this.rows,
@@ -424,6 +437,7 @@ class ReportResult {
   final String reportCode;
   final String displayName;
   final int definitionVersion;
+  final int engineVersion;
   final int companyId;
   final List<ReportColumn> columns;
   final List<Map<String, dynamic>> rows;
@@ -441,6 +455,7 @@ class ReportResult {
       reportCode: _asString(json['report_code']),
       displayName: _asString(json['display_name']),
       definitionVersion: _asInt(json['definition_version']),
+      engineVersion: _asInt(json['engine_version'], fallback: 1),
       companyId: _asInt(json['o_id']),
       columns: columns,
       rows: _objectList(json['rows']),

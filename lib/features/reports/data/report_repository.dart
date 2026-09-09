@@ -2,7 +2,6 @@ import '../../../core/config/app_config.dart';
 import '../../../core/models/api_response.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/storage/token_storage.dart';
-import '../models/report_configuration_models.dart';
 import '../models/report_models.dart';
 
 class ReportRepository {
@@ -116,61 +115,12 @@ class ReportRepository {
     return ReportResult.fromJson(response.data);
   }
 
-  Future<List<ReportConfigurationSummary>> getConfigurationList() async {
-    final response = await _postConfigure(
-      const <String, dynamic>{'operation': 'List'},
-    );
-    return _objectList(response.data['reports'])
-        .map(ReportConfigurationSummary.fromJson)
-        .where((item) => item.id > 0)
-        .toList(growable: false);
-  }
-
-  Future<ReportConfigurationDraft> getConfiguration({
-    required int reportId,
-  }) async {
-    final response = await _postConfigure(<String, dynamic>{
-      'operation': 'Get',
-      'report_id': reportId,
-    });
-    final report = _asMap(response.data['report']);
-    if (report.isEmpty) {
-      throw const ApiException(
-        'The API returned an empty report configuration.',
-      );
-    }
-    return ReportConfigurationDraft.fromJson(report);
-  }
-
-  Future<ReportConfigurationSaveResult> saveConfiguration(
-    ReportConfigurationDraft configuration,
-  ) async {
-    final response = await _postConfigure(
-      configuration.toPayload(),
-      timeout: Duration(
-        seconds: configuration.timeoutSeconds.clamp(10, 900).toInt() + 20,
-      ),
-    );
-    return ReportConfigurationSaveResult.fromJson(response.data);
-  }
-
   Future<ApiResponse> _postRuntime(
     Map<String, dynamic> data, {
     Duration timeout = const Duration(seconds: 30),
   }) {
     return _postReport(
       AppConfig.reportRuntimePath,
-      data,
-      timeout: timeout,
-    );
-  }
-
-  Future<ApiResponse> _postConfigure(
-    Map<String, dynamic> data, {
-    Duration timeout = const Duration(seconds: 45),
-  }) {
-    return _postReport(
-      AppConfig.reportConfigurePath,
       data,
       timeout: timeout,
     );
