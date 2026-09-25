@@ -1,3 +1,5 @@
+import '../../../dashboard/data/dashboard_repository.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/models/api_response.dart';
@@ -17,11 +19,13 @@ class LoginPage extends StatefulWidget {
     required this.repository,
     required this.userMappingRepository,
     required this.reportRepository,
+    required this.dashboardRepository,
   });
 
   final AuthRepository repository;
   final UserMappingRepository userMappingRepository;
   final ReportRepository reportRepository;
+  final DashboardSource dashboardRepository;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -62,10 +66,12 @@ class _LoginPageState extends State<LoginPage> {
             authRepository: widget.repository,
             userMappingRepository: widget.userMappingRepository,
             reportRepository: widget.reportRepository,
+            dashboardRepository: widget.dashboardRepository,
             loginBuilder: (_) => LoginPage(
               repository: widget.repository,
               userMappingRepository: widget.userMappingRepository,
               reportRepository: widget.reportRepository,
+              dashboardRepository: widget.dashboardRepository,
             ),
           ),
         ),
@@ -120,12 +126,11 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: _loading
                     ? null
                     : () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => ResetPasswordPage(
-                              repository: widget.repository,
-                            ),
-                          ),
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              ResetPasswordPage(repository: widget.repository),
                         ),
+                      ),
                 child: const Text('Forgot password?'),
               ),
             ),
@@ -149,12 +154,12 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _loading
                       ? null
                       : () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => CreateAccountPage(
-                                repository: widget.repository,
-                              ),
+                          MaterialPageRoute<void>(
+                            builder: (_) => CreateAccountPage(
+                              repository: widget.repository,
                             ),
                           ),
+                        ),
                   child: const Text('Create account'),
                 ),
               ],

@@ -1,0 +1,198 @@
+{
+  "cash": {
+    "bank": -20,
+    "cash": 100,
+    "basis": "Latest current-financial-year balances. Legacy rows without RID/OID are excluded; resync LedgerBalancesFY.",
+    "available": true,
+    "last_sync_on": "2026-09-20T00:00:00",
+    "account_count": 2,
+    "missing_accounts": 0
+  },
+  "o_id": 11,
+  "to_date": "2026-09-30",
+  "activity": {
+    "basis": "Permitted party and voucher types; gross voucher values excluding cancelled, deleted and optional vouchers. Returns are not netted.",
+    "trend": [
+      {
+        "month": "2026-09-01",
+        "sales": 300,
+        "purchases": 80
+      }
+    ],
+    "recent": [
+      {
+        "id": 2,
+        "date": "2026-09-30T23:59:59.999",
+        "type": "Sales",
+        "party": "Customer A",
+        "amount": 200,
+        "voucher": "V2"
+      },
+      {
+        "id": 6,
+        "date": "2026-09-12T00:00:00",
+        "type": "Payment",
+        "party": "Supplier A",
+        "amount": 40,
+        "voucher": "V6"
+      },
+      {
+        "id": 5,
+        "date": "2026-09-12T00:00:00",
+        "type": "Receipt",
+        "party": "Customer A",
+        "amount": 60,
+        "voucher": "V5"
+      },
+      {
+        "id": 4,
+        "date": "2026-09-10T00:00:00",
+        "type": "Purchase",
+        "party": "Supplier A",
+        "amount": 80,
+        "voucher": "V4"
+      },
+      {
+        "id": 1,
+        "date": "2026-09-01T00:00:00",
+        "type": "Sales",
+        "party": "Customer A",
+        "amount": 100,
+        "voucher": "V1"
+      }
+    ],
+    "current": {
+      "sales": 300,
+      "payments": 40,
+      "receipts": 60,
+      "purchases": 80,
+      "sales_count": 2,
+      "voucher_count": 5,
+      "purchase_count": 1
+    },
+    "previous": {
+      "sales": 50,
+      "payments": 0,
+      "receipts": 0,
+      "purchases": 0,
+      "sales_count": 1,
+      "voucher_count": 1,
+      "purchase_count": 0
+    },
+    "top_items": [
+      {
+        "name": "Steel",
+        "unit": "Nos",
+        "amount": 150,
+        "quantity": 1
+      },
+      {
+        "name": "Steel",
+        "unit": "Kgs",
+        "amount": 80,
+        "quantity": 2
+      }
+    ]
+  },
+  "from_date": "2026-09-01",
+  "inventory": {
+    "basis": "Latest stock snapshot in permitted warehouses. Movement means last outward date per item/unit, not stock age.",
+    "items": 3,
+    "value": 490,
+    "movement": [
+      {
+        "sort": 0,
+        "count": 1,
+        "label": "Moved ≤30 days"
+      },
+      {
+        "sort": 1,
+        "count": 0,
+        "label": "31–60 days"
+      },
+      {
+        "sort": 2,
+        "count": 0,
+        "label": "61–90 days"
+      },
+      {
+        "sort": 3,
+        "count": 1,
+        "label": "No outward in 90 days"
+      }
+    ],
+    "low_stock": 1,
+    "stock_lines": 4,
+    "last_sync_on": null,
+    "out_of_stock": 1,
+    "negative_stock": 1,
+    "has_item_access": true,
+    "no_outward_90_days": 1,
+    "has_warehouse_access": true,
+    "configured_thresholds": 1
+  },
+  "as_of_date": "2026-09-30",
+  "outstanding": {
+    "basis": "Latest pending-bill snapshot; aged by reference date plus credit days. Credits and advances shown separately.",
+    "ageing": [
+      {
+        "sort": 0,
+        "label": "Not due",
+        "payables": 75,
+        "receivables": 100
+      },
+      {
+        "sort": 1,
+        "label": "1–30 days",
+        "payables": 500,
+        "receivables": 200
+      },
+      {
+        "sort": 2,
+        "label": "31–60 days",
+        "payables": 0,
+        "receivables": 0
+      },
+      {
+        "sort": 3,
+        "label": "61–90 days",
+        "payables": 0,
+        "receivables": 300
+      },
+      {
+        "sort": 4,
+        "label": "90+ days",
+        "payables": 0,
+        "receivables": 0
+      },
+      {
+        "sort": 5,
+        "label": "Unknown due date",
+        "payables": 0,
+        "receivables": 400
+      }
+    ],
+    "undated": 400,
+    "payables": 575,
+    "customers": 1,
+    "suppliers": 1,
+    "receivables": 1000,
+    "top_customers": [
+      {
+        "name": "Customer A",
+        "amount": 1000,
+        "overdue_days": 61
+      }
+    ],
+    "customer_credits": 25,
+    "overdue_payables": 500,
+    "supplier_advances": 30,
+    "upcoming_payables": 75,
+    "overdue_receivables": 500,
+    "customers_over_60_days": 1
+  },
+  "company_name": "Company A",
+  "generated_at": "2026-09-22T16:32:16.27+00:00",
+  "last_sync_on": null,
+  "schema_version": 1
+}

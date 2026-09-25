@@ -1,3 +1,5 @@
+import 'features/dashboard/data/dashboard_repository.dart';
+
 import 'package:flutter/material.dart';
 
 import 'core/network/api_client.dart';
@@ -26,6 +28,7 @@ class _CmxWebPortalAppState extends State<CmxWebPortalApp> {
   late final AuthRepository _authRepository;
   late final UserMappingRepository _userMappingRepository;
   late final ReportRepository _reportRepository;
+  late final DashboardRepository _dashboardRepository;
 
   @override
   void initState() {
@@ -37,6 +40,10 @@ class _CmxWebPortalAppState extends State<CmxWebPortalApp> {
       tokenStorage: _tokenStorage,
     );
     _userMappingRepository = UserMappingRepository(
+      apiClient: _apiClient,
+      tokenStorage: _tokenStorage,
+    );
+    _dashboardRepository = DashboardRepository(
       apiClient: _apiClient,
       tokenStorage: _tokenStorage,
     );
@@ -62,6 +69,7 @@ class _CmxWebPortalAppState extends State<CmxWebPortalApp> {
         repository: _authRepository,
         userMappingRepository: _userMappingRepository,
         reportRepository: _reportRepository,
+        dashboardRepository: _dashboardRepository,
       ),
     );
   }

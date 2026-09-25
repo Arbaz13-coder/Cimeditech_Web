@@ -1,3 +1,5 @@
+import '../../../dashboard/data/dashboard_repository.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../auth/data/auth_repository.dart';
@@ -8,12 +10,7 @@ import '../../../reports/presentation/pages/reports_page.dart';
 import '../../../user_mapping/data/user_mapping_repository.dart';
 import '../../../user_mapping/presentation/pages/user_mapping_page.dart';
 
-enum PortalSection {
-  dashboard,
-  dataManagement,
-  reports,
-  reportDesigner,
-}
+enum PortalSection { dashboard, dataManagement, reports, reportDesigner }
 
 class PortalShell extends StatefulWidget {
   const PortalShell({
@@ -21,12 +18,14 @@ class PortalShell extends StatefulWidget {
     required this.authRepository,
     required this.userMappingRepository,
     required this.reportRepository,
+    required this.dashboardRepository,
     required this.loginBuilder,
   });
 
   final AuthRepository authRepository;
   final UserMappingRepository userMappingRepository;
   final ReportRepository reportRepository;
+  final DashboardSource dashboardRepository;
   final WidgetBuilder loginBuilder;
 
   @override
@@ -50,7 +49,8 @@ class _PortalShellState extends State<PortalShell> {
   Future<void> _logout() async {
     if (_loggingOut) return;
 
-    final shouldLogout = await showDialog<bool>(
+    final shouldLogout =
+        await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Sign out?'),
@@ -104,6 +104,8 @@ class _PortalShellState extends State<PortalShell> {
     switch (section) {
       case PortalSection.dashboard:
         return DashboardPage(
+          repository: widget.dashboardRepository,
+          onSessionExpired: _expireSession,
           key: const PageStorageKey('dashboard'),
           onOpenReports: () => _select(PortalSection.reports),
           onOpenUserMapping: () => _select(PortalSection.dataManagement),
@@ -181,7 +183,8 @@ class _PortalShellState extends State<PortalShell> {
                 selected: _section,
                 collapsed: _sidebarCollapsed,
                 loggingOut: _loggingOut,
-                onToggle: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
+                onToggle: () =>
+                    setState(() => _sidebarCollapsed = !_sidebarCollapsed),
                 onSelected: _select,
                 onLogout: _logout,
               ),
@@ -398,8 +401,9 @@ class _SidebarItem extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: collapsed ? 0 : 11),
             child: Row(
-              mainAxisAlignment:
-                  collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+              mainAxisAlignment: collapsed
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: [
                 Icon(icon, color: foreground, size: 20),
                 if (!collapsed) ...[
@@ -415,7 +419,9 @@ class _SidebarItem extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: foreground,
-                            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                            fontWeight: selected
+                                ? FontWeight.w800
+                                : FontWeight.w600,
                             fontSize: 13,
                           ),
                         ),
@@ -443,7 +449,10 @@ class _SidebarItem extends StatelessWidget {
     );
 
     if (!collapsed) return item;
-    return Tooltip(message: subtitle == null ? label : '$label · $subtitle', child: item);
+    return Tooltip(
+      message: subtitle == null ? label : '$label · $subtitle',
+      child: item,
+    );
   }
 }
 
@@ -596,48 +605,48 @@ class _MobileSidebar extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(10),
                 children: [
-                    _SidebarItem(
-                      icon: Icons.grid_view_rounded,
-                      label: 'Dashboard',
-                      collapsed: false,
-                      selected: selected == PortalSection.dashboard,
-                      onTap: () => onSelected(PortalSection.dashboard),
-                    ),
-                    const SizedBox(height: 5),
-                    _SidebarItem(
-                      icon: Icons.admin_panel_settings_outlined,
-                      label: 'Data Management',
-                      subtitle: 'User Mapping',
-                      collapsed: false,
-                      selected: selected == PortalSection.dataManagement,
-                      onTap: () => onSelected(PortalSection.dataManagement),
-                    ),
-                    const SizedBox(height: 5),
-                    _SidebarItem(
-                      icon: Icons.analytics_outlined,
-                      label: 'Reports',
-                      subtitle: 'Dynamic Reports',
-                      collapsed: false,
-                      selected: selected == PortalSection.reports,
-                      onTap: () => onSelected(PortalSection.reports),
-                    ),
-                    const SizedBox(height: 5),
-                    _SidebarItem(
-                      icon: Icons.design_services_outlined,
-                      label: 'Report Designer',
-                      collapsed: false,
-                      selected: selected == PortalSection.reportDesigner,
-                      onTap: () => onSelected(PortalSection.reportDesigner),
-                    ),
-                    const SizedBox(height: 24),
-                    _SidebarItem(
-                      icon: Icons.logout_rounded,
-                      label: 'Sign out',
-                      collapsed: false,
-                      selected: false,
-                      onTap: onLogout,
-                    ),
-                  ],
+                  _SidebarItem(
+                    icon: Icons.grid_view_rounded,
+                    label: 'Dashboard',
+                    collapsed: false,
+                    selected: selected == PortalSection.dashboard,
+                    onTap: () => onSelected(PortalSection.dashboard),
+                  ),
+                  const SizedBox(height: 5),
+                  _SidebarItem(
+                    icon: Icons.admin_panel_settings_outlined,
+                    label: 'Data Management',
+                    subtitle: 'User Mapping',
+                    collapsed: false,
+                    selected: selected == PortalSection.dataManagement,
+                    onTap: () => onSelected(PortalSection.dataManagement),
+                  ),
+                  const SizedBox(height: 5),
+                  _SidebarItem(
+                    icon: Icons.analytics_outlined,
+                    label: 'Reports',
+                    subtitle: 'Dynamic Reports',
+                    collapsed: false,
+                    selected: selected == PortalSection.reports,
+                    onTap: () => onSelected(PortalSection.reports),
+                  ),
+                  const SizedBox(height: 5),
+                  _SidebarItem(
+                    icon: Icons.design_services_outlined,
+                    label: 'Report Designer',
+                    collapsed: false,
+                    selected: selected == PortalSection.reportDesigner,
+                    onTap: () => onSelected(PortalSection.reportDesigner),
+                  ),
+                  const SizedBox(height: 24),
+                  _SidebarItem(
+                    icon: Icons.logout_rounded,
+                    label: 'Sign out',
+                    collapsed: false,
+                    selected: false,
+                    onTap: onLogout,
+                  ),
+                ],
               ),
             ),
           ],
